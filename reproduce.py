@@ -197,10 +197,15 @@ def main():
             actual=st.mean(y)
             assert abs(actual-expected)<.000051,(B,m,actual,expected)
             difference=[x-z for x,z in zip(y,output['racing'])]
+            paired_sd=st.stdev(difference)
+            paired_mean=st.mean(difference)
+            margin=1.96*paired_sd/math.sqrt(len(difference))
             summaries[m]={'mean_archive_score':actual,'mean_archive_simple_regret':truth[winner]-actual,
                           'selection_correct_fraction':sum(x==truth[winner] for x in y)/300,
                           'certificates':certificates[m],
-                          'mean_paired_difference_vs_racing':st.mean(difference),
+                          'mean_paired_difference_vs_racing':paired_mean,
+                          'paired_difference_stddev':paired_sd,
+                          'descriptive_95pct_normal_interval_for_mean_paired_difference':[paired_mean-margin,paired_mean+margin],
                           'median_paired_difference_vs_racing':st.median(difference),
                           'positive_paired_fraction':sum(x>0 for x in difference)/300,
                           'tie_paired_fraction':sum(x==0 for x in difference)/300}
